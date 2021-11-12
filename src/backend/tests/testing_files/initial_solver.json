@@ -1,0 +1,6 @@
+{
+    "solver_name": "Test Solver",
+    "code_verification_status": true,
+    "truncation_error": 1.234,
+    "discretization_error": 5.678
+}

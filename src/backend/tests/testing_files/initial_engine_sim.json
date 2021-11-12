@@ -1,0 +1,15 @@
+{
+    "sim_name":  "An Awesome Engine Simulation",
+    "description": "This simulation is for testing",
+    "vvuq_goals": [
+        "Planning and Prioritization",  
+        "Code Verification", 
+        "Model Processing",
+        "Surrogate Modeling",
+        "Calibration",
+        "Propagation",
+        "Validation"
+    ],
+    "discipline": "Example discipline",
+    "system": "Example system"
+}

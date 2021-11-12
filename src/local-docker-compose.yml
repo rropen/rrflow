@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  mongo:
+    container_name: local_rrflow_mongo
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    env_file:
+      - ./db/.env
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    env_file:
+      - ./db/.env
+  backend:
+    command: uvicorn rrflow.main:app --workers 4 --host 0.0.0.0 --port 8181 --reload
+    ports:
+      - 8181:8181
+    volumes:
+      - ./backend/:/app
+
+  # frontend:
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - VITE_MODE=development
+  #     - NODE_ENV=development
+  #     - VITE_API_URL=http://localhost:8181
+  #     - VITE_COVERAGE=true
+  #   ports:
+  #     - 3000:80
