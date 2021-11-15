@@ -2,7 +2,7 @@ from rrflow.routes.flow_items import crud
 from rrflow.logger import create_logger
 from rrflow.config import get_settings
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Depends, Path, Header
+from fastapi import APIRouter, HTTPException, Path, Header
 import logging
 import rrflow.schemas as schemas
 
@@ -93,15 +93,17 @@ def create_flow_item(
 
     Request Body Parameters:
 
-    - **category**: event category for the flow item. Must be one of the following options:
-        1. "Deployment"
-        2. "Issue"
-        3. "Pull Request"
-        4. "Production Defect"
-    - **issue**: sets the issue number that the flowItem is associated with
+    - **flow_item_category**: category for the flow item. Must be one of the following options:
+        1. "Feat"
+        2. "Defect"
+        3. "Debt"
+        4. "Risk"
     - **start_time**: sets the start time of the FlowItem
     - **end_time**: sets the end time of the FlowItem (could be merged date or closed date depending on metric needs for the specified FlowItem category)
-    - **duration_open**: sets duration of FlowItem being open
+    - **sum_active**: sum of time where the FlowItem was in the active state
+    - **activity_state**: boolean value for activity state (0 for inactive, 1 for active)
+    - **comments**: string to hold comments about the FlowItem
+    - **last_modified_time**: datetime for when the item was last modified
     - **program_id**: sets program the FlowItem belongs to
     """
 
@@ -186,14 +188,17 @@ def update_flow_item(
 
     Request Body Parameters:
 
-    - **category**: event category for the flow item. Must be one of the following options:
-        1. "Deployment"
-        2. "Issue"
-        3. "Pull Request"
-        4. "Production Defect"
-    - **issue**: sets the issue number that the flowItem is associated with
+    - **flow_item_category**: category for the flow item. Must be one of the following options:
+        1. "Feat"
+        2. "Defect"
+        3. "Debt"
+        4. "Risk"
     - **start_time**: sets the start time of the FlowItem
     - **end_time**: sets the end time of the FlowItem (could be merged date or closed date depending on metric needs for the specified FlowItem category)
+    - **sum_active**: sum of time where the FlowItem was in the active state
+    - **activity_state**: boolean value for activity state (0 for inactive, 1 for active)
+    - **comments**: string to hold comments about the FlowItem
+    - **last_modified_time**: datetime for when the item was last modified
     - **program_id**: sets program the FlowItem belongs to
     """
     updated_flow_item = crud.update_flow_item(

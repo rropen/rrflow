@@ -19,7 +19,7 @@ class FlowItemCategory(str, Enum):
     RISK     = "risk"
 
 class FlowItem(mongoengine.EmbeddedDocument):
-    flow_item_categroy = mongoengine.EnumField(FlowItemCategory)
+    category = mongoengine.EnumField(FlowItemCategory)
     start_time = mongoengine.DateField()
     end_time   = mongoengine.DateField()
     sum_active = mongoengine.FloatField()
@@ -29,7 +29,7 @@ class FlowItem(mongoengine.EmbeddedDocument):
 
 
 class Program(mongoengine.Document):
-    program_name = mongoengine.StringField(required = True)
-    program_desc = mongoengine.StringField(required = True)
+    name = mongoengine.StringField(required = True)
+    description = mongoengine.StringField(required = True)
     flow_items   = mongoengine.ListField(mongoengine.EmbeddedDocumentField(FlowItem))
     # flow_item_ids = mongoengine.ListField(mongoengine.ObjectIdField()) <--- A different way of doing it

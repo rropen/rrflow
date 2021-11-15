@@ -33,7 +33,7 @@ class FlowItemCreate(FlowItemBase):
 class FlowItemUpdate(FlowItemBase):
     pass
 
-class FlowItemDisplay(MongoModel):
+class FlowItemDisplay(FlowItemBase):
     id: OID
     category: Optional[documents.FlowItemCategory]
     start_time: Optional[datetime]
@@ -45,7 +45,8 @@ class FlowItemDisplay(MongoModel):
 
     @staticmethod
     def from_doc(item_input: documents.FlowItem):
-        return(FlowItem(item_input.to_mongo().to_dict()))
+        input_dict = item_input.to_mongo().to_dict()
+        return FlowItemDisplay.from_mongo(input_dict)
 
 ### Program ###
 class ProgramBase(MongoModel):
@@ -61,3 +62,20 @@ class Program(ProgramBase):
 class ProgramCreate(ProgramBase):
     pass
 
+class ProgramUpdate(ProgramBase):
+    name: Optional[str]
+    description: Optional[str]
+    flow_items: Optional[List[FlowItem]]
+    
+class ProgramDisplay(MongoModel):
+    name: str
+    description: str
+    flow_items: List[FlowItem]
+
+    @staticmethod
+    def from_doc(item_input: documents.Program):
+        input_dict = item_input.to_mongo().to_dict()
+        
+        disp_prog = ProgramDisplay.from_mongo(input_dict)        
+        
+        return disp_prog

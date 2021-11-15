@@ -1,5 +1,7 @@
+"""
+    CRUD for the FlowItem Embedded Document
+"""
 from fastapi.exceptions import HTTPException
-from sqlmodel import Session, select, and_
 from rrflow.utils import verify_program_auth_token, program_selector
 import logging
 from rrflow.config import get_settings
@@ -14,7 +16,6 @@ logger = create_logger(__name__)
 
 
 def get_all(
-    db: Session,
     skip: int = 0,
     limit: int = 1000,
     program_id: int = None,
@@ -55,7 +56,9 @@ def create_flow_item(flow_item_data, program_auth_token):
     if verified:
         flow_item_db = documents.FlowItem(**flow_item_data.dict()).save()
         
-        #TODO: VVV Add some kind of check that it was stored correctly with data from flow_item_data before returning
+        # Embed the FlowItem document to the correct program document
+        intended_program.flow_items.append(flow_item_db) 
+
         new_flow_item = refresh_flow_item(flow_item_db)
         if new_flow_item:
             return new_flow_item
