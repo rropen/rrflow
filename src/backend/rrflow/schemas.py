@@ -34,7 +34,6 @@ class FlowItemUpdate(FlowItemBase):
     pass
 
 class FlowItemDisplay(FlowItemBase):
-    id: OID
     category: Optional[documents.FlowItemCategory]
     start_time: Optional[datetime]
     end_time: Optional[datetime]

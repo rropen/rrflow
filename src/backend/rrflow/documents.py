@@ -4,10 +4,9 @@
     "Documents" are mongoengine document templates.
     "Schemas" are pydantic data shape models.
 """
-from collections import defaultdict
-from enum import Enum, unique
+from enum import Enum
+from rrflow.utility_classes import OID
 
-import fastapi
 import mongoengine
 import rrflow.database as database
 
@@ -26,6 +25,7 @@ class FlowItem(mongoengine.EmbeddedDocument):
     activity_state = mongoengine.BooleanField()
     comments = mongoengine.StringField()
     last_modified_time = mongoengine.DateField() # not sure why we need this 
+    program_id = OID()
 
 
 class Program(mongoengine.Document):
@@ -33,3 +33,5 @@ class Program(mongoengine.Document):
     description = mongoengine.StringField(required = True)
     flow_items   = mongoengine.ListField(mongoengine.EmbeddedDocumentField(FlowItem))
     # flow_item_ids = mongoengine.ListField(mongoengine.ObjectIdField()) <--- A different way of doing it
+
+    meta = {"db_alias": database.alias, "collection": "programs"}

@@ -168,7 +168,7 @@ cd src
 docker-compose -f docker-compose.yml -f local-docker-compose.yml build
 
 # Run the container in detached mode to return your command prompt
-docker-compose -f docker-compose.yml -f local-docker-compose.yml up -d backend
+docker-compose -f docker-compose.yml -f local-docker-compose.yml up -d
 ```
 
 <!--

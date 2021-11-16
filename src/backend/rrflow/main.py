@@ -10,6 +10,7 @@ import logging
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 from rrflow.routes.flow_items import routes as flow_items
 from rrflow.routes.programs import routes as programs
+from rrflow.routes.utilities import routes as utilities
 # from rrflow.routes.graphql.routes import query
 from rrflow.routes import root
 from rrflow.logger import create_logger
@@ -61,5 +62,6 @@ app.add_middleware(
 app.include_router(root.router, prefix="", tags=["root"])
 app.include_router(flow_items.router, prefix="/flowItems", tags=["flowItems"])
 app.include_router(programs.router, prefix="/programs", tags=["programs"])
+app.include_router(utilities.router, prefix="/utilities", tags=["utilities"])
 # app.include_router(utilities.router, prefix="/utilities", tags=["utilities"])
 # app.mount("/graph", GraphQLApp(query, on_get=make_graphiql_handler()))

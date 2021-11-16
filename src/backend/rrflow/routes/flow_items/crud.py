@@ -2,6 +2,7 @@
     CRUD for the FlowItem Embedded Document
 """
 from fastapi.exceptions import HTTPException
+from pydantic.networks import HttpUrl
 from rrflow.utils import verify_program_auth_token, program_selector
 import logging
 from rrflow.config import get_settings
@@ -26,12 +27,20 @@ def get_all(
     program = program_selector(program_name, program_id)
     
     if program:
-        return documents.FlowItem.objects(program_id = program.id).skip(skip).limit(limit)
+        # VVV TODO: Skip/Limit integration
+        return program.flow_items
 
-    items = documents.FlowItem.objects
-    if len(items) == 0:
-        raise HTTPException(status_code=404, detail="No flow items found")
-    return items
+    if not program:
+        programs = documents.Program.objects()
+        if len(programs) == 0:
+            raise HTTPException(status_code=404, detail="No Programs found, therefore no FlowItems exist")
+
+        # VVV TODO: Skip limit integration
+        item_list = []
+        for program in programs:
+            item_list.extend(program.flow_items) 
+
+    return item_list
 
 
 def get_by_id(flow_item_id):
@@ -46,31 +55,34 @@ def get_by_id(flow_item_id):
 
 def create_flow_item(flow_item_data, program_auth_token):
     """Take data from request and create a new flowItem in the database."""
-    intended_program = documents.Program.objects(id=flow_item_data.program_id).first()
+    # intended_program = documents.Program.objects(id=flow_item_data.program_id).first()
+    intended_program = documents.Program.objects().first()
     if not intended_program:
         logger.debug("program not found")
         raise HTTPException(status_code=404, detail="program not found")
-    verified = verify_program_auth_token(
-        program_auth_token, intended_program.program_auth_token_hashed
-    )
-    if verified:
-        flow_item_db = documents.FlowItem(**flow_item_data.dict()).save()
-        
-        # Embed the FlowItem document to the correct program document
-        intended_program.flow_items.append(flow_item_db) 
+    # verified = verify_program_auth_token(
+    #     program_auth_token, intended_program.program_auth_token_hashed
+    # )
+    # if verified:
+    flow_item_db = documents.FlowItem(**flow_item_data.dict())
+    
+    # Embed the FlowItem document to the correct program document
+    intended_program.flow_items.append(flow_item_db)
+    intended_program.save()
 
-        new_flow_item = refresh_flow_item(flow_item_db)
-        if new_flow_item:
-            return new_flow_item
-        else:
-            logger.error("Item did not store correctly")
-            raise HTTPException(
-                status_code=404, detail="Item did not store correctly"
-            )  # didn't store correctly
+    # new_flow_item = refresh_flow_item(flow_item_db)
+    # if new_flow_item:
+    # return new_flow_item
+    return flow_item_db
+    #     else:
+    #         logger.error("Item did not store correctly")
+    #         raise HTTPException(
+    #             status_code=404, detail="Item did not store correctly"
+    #         )  # didn't store correctly
 
-    else:
-        logger.warning("Attempted to access program with incorrect program auth token")
-        raise HTTPException(status_code=401, detail="Credentials are incorrect")
+    # else:
+        # logger.warning("Attempted to access program with incorrect program auth token")
+        # raise HTTPException(status_code=401, detail="Credentials are incorrect")
 
 
 def delete_flow_item(flow_item_id, program_auth_token):
@@ -111,7 +123,8 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
         logger.debug("Item not found")
         raise HTTPException(status_code=404, detail="Item not found")
 
-    intended_program = documents.Program.objects(id=flow_item.program_id).first()
+    # intended_program = documents.Program.objects(id=flow_item.program_id).first()
+    intended_program = documents.Program.objects().first()
     if not intended_program:
         logger.debug("program not found")
         raise HTTPException(status_code=404, detail="program not found")
@@ -138,7 +151,7 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
         logger.error("Item did not store correctly")
         raise HTTPException(status_code=404, detail="Item did not store correctly")
 
-def refresh_flow_item(flow_item: documents.FlowItem) -> documents.FlowItem:
-    if flow_item is None:
-        return None
-    return documents.FlowItem.objects(id=flow_item.id).first()
+# def refresh_flow_item(flow_item: documents.FlowItem) -> documents.FlowItem:
+    # if flow_item is None:
+        # return None
+    # return documents.FlowItem.objects(id=flow_item.id).first()

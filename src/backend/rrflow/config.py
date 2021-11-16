@@ -1,24 +1,28 @@
 from pydantic import BaseSettings
 import os
 from dotenv import load_dotenv
-import urllib
 from functools import lru_cache
 
 load_dotenv()
 
-def generate_db_string(ENV: str, DBHOST: str, DBNAME: str, DBUSER: str, DBPASS: str):
+
+def generate_db_string(
+    ENV: str, DBHOST: str, DBPORT: str, DBNAME: str, DBUSER: str, DBPASS: str
+):
     """Take in env variables and generate correct db string."""
 
     if ENV == "test":
-        #TODO: Unimplemented.
+        # TODO: Unimplemented.
         return "mongomock://localhost"
         pass
 
     if ENV == "local":
-        return "mongodb://localhost:27017/" # local mongodb for local development
+        # return "mongodb://localhost:/27017" # local mongodb for local development
+        # return "mongodb://{}:{}@{}:{}/{}?authSource=admin".format(DBUSER, DBPASS, DBHOST, DBPORT, DBNAME)
+        return "mongodb://{}:{}/".format(DBHOST, DBPORT)
 
     if ENV == "development" or "production":
-        #TODO: Unimplemented.
+        # TODO: Unimplemented.
         pass
 
 
@@ -34,29 +38,29 @@ class Settings(BaseSettings):
     ADMIN_KEY: Long string that will set the admin key used to generate new project keys.
     FRONTEND_URL: Location from which API requests will be made by the frontend.  This will need refactored if we start to have other tools using this API.
     DBHOST: Hostname for a database used in building a connection string
+    DBPORT: Port where the database is found
     DBNAME: Database name used in building a connection string
     DBUSER: Username used in building a connection string
     DBPASS: User's Password used in building a connection string
     AZURELOGGING_CONN_STR: Connection string to azure log handler
     """
 
-    APP_NAME: str = "rrflow"
+    APP_NAME: str = "vvuq"
     # dev or test
     ENV: str = os.environ.get("ENV") or "test"
-    DEBUG: bool = (os.environ.get("DEBUG", "False") == "True") or False
-    TESTING: bool = os.environ.get("TESTING", "False") == "True"
+    DEBUG: bool = os.getenv("DEBUG", "False") == "True"
+    TESTING: bool = os.getenv("TESTING", "False") == "True"
     SECRET_KEY: str = os.environ.get("SECRET_KEY") or "unset"
     ADMIN_KEY: str = os.environ.get("ADMIN_KEY") or "unset"
     FRONTEND_URL: str = os.environ.get("FRONTEND_URL") or "unset"
-    GITHUB_API_TOKEN: str = os.environ.get("GITHUB_API_TOKEN") or "unset"
-    API_AUTH_TOKEN: str = os.environ.get("API_AUTH_TOKEN") or "unset"
     DBHOST: str = os.environ.get("DBHOST") or "unset"
+    DBPORT: str = os.environ.get("DBPORT") or "unset"
     DBNAME: str = os.environ.get("DBNAME") or "unset"
     DBUSER: str = os.environ.get("DBUSER") or "unset"
     DBPASS: str = os.environ.get("DBPASS") or "unset"
-    DBALIAS: str = os.environ.get("DBALIAS") or "default"
     AZURELOGGING_CONN_STR: str = os.environ.get("AZURELOGGING_CONN_STR") or "unset"
-    CONN_STR: str = generate_db_string(ENV, DBHOST, DBNAME, DBUSER, DBPASS)
+    GITHUB_API_TOKEN: str = os.environ.get("GITHUB_API_TOKEN") or "unset"
+    CONN_STR: str = generate_db_string(ENV, DBHOST, DBPORT, DBNAME, DBUSER, DBPASS)
 
 
 @lru_cache()
