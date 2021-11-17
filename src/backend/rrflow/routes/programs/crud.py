@@ -25,15 +25,19 @@ def update_program(update_data = schemas.ProgramUpdate, program_name: str = None
     program = program_selector(program_name, program_id)
     print(update_data.flow_items)
 
-    flow_items = []
-    for item in update_data.flow_items:
-        flow_items.append(flow_item_crud.create_flow_item(item, "adfad"))
-
     if update_data.flow_items:
-        program.update(add_to_set__flow_items=flow_items)
+        flow_items = []
+        for item in update_data.flow_items:
+            flow_items.append(flow_item_crud.create_flow_item(item, program_id, "dfdafad"))
+
+            program.update(add_to_set__flow_items=flow_items)
     
     if update_data.description:
         program.update(set__description=update_data.description) 
+        
+    if update_data.name:
+        program.update(set__name=update_data.name)
+    
     
     program.reload()
     return program

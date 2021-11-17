@@ -1,6 +1,7 @@
 from rrflow.routes.flow_items import crud
 from rrflow.logger import create_logger
 from rrflow.config import get_settings
+from rrflow.utility_classes import OID
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Path, Header
 import logging
@@ -17,7 +18,7 @@ router = APIRouter()
 def get_flow_items(
     skip: int = 0,
     limit: int = 100,
-    program_id: Optional[int] = None,
+    program_id: Optional[OID] = None,
     program_name: Optional[str] = None
 ):
     """
@@ -49,9 +50,9 @@ def get_flow_items(
 
     return flow_schemas
 
-
+### VVV TODO: Makes no sense, embedded documents do not have IDs
 @router.get("/{flow_item_id}")
-def get_flow_item(flow_item_id: int):
+def get_flow_item(flow_item_id: OID):
     """
     ## Get FlowItem by ID
 
@@ -74,9 +75,10 @@ def get_flow_item(flow_item_id: int):
 
 
 @router.post("/")
-def create_flow_item(
+def create_flow_item(*,
     flow_item_data: schemas.FlowItemCreate,
-    program_auth_token: str = Header(...),
+    program_auth_token: str = Header(None),
+    program_id: OID
 ):
     """
     ## Create FlowItem entry in db
@@ -110,17 +112,16 @@ def create_flow_item(
     # Creates the database row and stores it in the table
 
     new_flow_item_success = crud.create_flow_item(
-        flow_item_data, program_auth_token
+        flow_item_data, program_id, program_auth_token
     )
 
+    print(new_flow_item_success)
+    print(new_flow_item_success._id)
     if new_flow_item_success:
-        return {
-            "code": "success",
-            "id": new_flow_item_success,
-        }
+        return schemas.FlowItemDisplay.from_doc(new_flow_item_success)
     else:
         logger.error("FlowItem not stored correctly")
-        return {"code": "error", "message": "Row Not Created"}  # pragma: no cover
+        raise HTTPException(status_code=500, detail="Row not created")
 
 
 # Since  FlowItem has no name, use database id to delete item

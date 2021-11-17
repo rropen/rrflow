@@ -5,6 +5,7 @@
     "Schemas" are pydantic data shape models.
 """
 from enum import Enum
+from bson import ObjectId
 from rrflow.utility_classes import OID
 
 import mongoengine
@@ -18,6 +19,7 @@ class FlowItemCategory(str, Enum):
     RISK     = "risk"
 
 class FlowItem(mongoengine.EmbeddedDocument):
+    _id = mongoengine.ObjectIdField(default=ObjectId())
     category = mongoengine.EnumField(FlowItemCategory)
     start_time = mongoengine.DateField()
     end_time   = mongoengine.DateField()
@@ -25,7 +27,7 @@ class FlowItem(mongoengine.EmbeddedDocument):
     activity_state = mongoengine.BooleanField()
     comments = mongoengine.StringField()
     last_modified_time = mongoengine.DateField() # not sure why we need this 
-    program_id = OID()
+    program_id = mongoengine.ObjectIdField()
 
 
 class Program(mongoengine.Document):

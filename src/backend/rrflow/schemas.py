@@ -8,8 +8,7 @@
     "Schemas" are pydantic data shape models.
 """
 from typing import List, Optional
-from enum import Enum, IntEnum
-from datetime import date, datetime
+from datetime import datetime
 
 import rrflow.documents as documents
 from rrflow.utility_classes import OID, MongoModel
@@ -25,6 +24,8 @@ class FlowItemBase(MongoModel):
     last_modified_time: Optional[datetime]
 
 class FlowItem(FlowItemBase):
+    id: OID
+    program_id: Optional[OID]
     pass
 
 class FlowItemCreate(FlowItemBase):
@@ -34,6 +35,7 @@ class FlowItemUpdate(FlowItemBase):
     pass
 
 class FlowItemDisplay(FlowItemBase):
+    id: OID
     category: Optional[documents.FlowItemCategory]
     start_time: Optional[datetime]
     end_time: Optional[datetime]
@@ -41,6 +43,7 @@ class FlowItemDisplay(FlowItemBase):
     activity_state: Optional[bool]
     comments: Optional[str]
     last_modified_time: Optional[datetime]
+    program_id: Optional[OID]
 
     @staticmethod
     def from_doc(item_input: documents.FlowItem):
@@ -49,9 +52,10 @@ class FlowItemDisplay(FlowItemBase):
 
 ### Program ###
 class ProgramBase(MongoModel):
+    id: OID
     name: str
     description: str
-    flow_items: List[FlowItem]
+    flow_items: Optional[List[FlowItem]]
     # flow_item_ids: List[OID] <-- A different way of doing it
     
 
@@ -61,15 +65,16 @@ class Program(ProgramBase):
 class ProgramCreate(ProgramBase):
     pass
 
-class ProgramUpdate(ProgramBase):
+class ProgramUpdate(MongoModel):
     name: Optional[str]
     description: Optional[str]
     flow_items: Optional[List[FlowItem]]
     
 class ProgramDisplay(MongoModel):
+    id: OID
     name: str
     description: str
-    flow_items: List[FlowItem]
+    flow_items: List[FlowItemDisplay]
 
     @staticmethod
     def from_doc(item_input: documents.Program):

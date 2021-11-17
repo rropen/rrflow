@@ -6,6 +6,7 @@ from typing import List
 import rrflow.schemas   as schemas
 import rrflow.documents as documents
 import rrflow.routes.programs.crud as program_crud
+from rrflow.utility_classes import OID
 
 router = fastapi.APIRouter()
 
@@ -55,13 +56,6 @@ def get_programs(params: CustomGetParams = Depends()) -> List[schemas.ProgramDis
     >When used together, *skip* and *limit* facilitate serverside pagination support.
 
     """
-    # # programs = documents.Program.objects.skip(params.skip).limit(params.limit)
-    # programs = documents.Program.objects[params.skip : params.skip+params.limit]
-    # # programs = documents.Program.objects.all()
-    # program_list = []
-    # for program in programs:
-    #     # program_list.append(schemas.ProgramDisplay.from_doc(program))
-    #     program_list.append(schemas.ProgramDisplay.from_mongo(program.to_mongo().to_dict()))
     
     program_docs = program_crud.get_programs(params.skip,params.limit)
     
@@ -72,13 +66,15 @@ def get_programs(params: CustomGetParams = Depends()) -> List[schemas.ProgramDis
     return program_schemas
 
 @router.get("/{program_id}", response_model=schemas.ProgramDisplay)
-def get_program_by_id (program_id: int):
+def get_program_by_id (program_id: OID):
     """
     Gets program from database with matching id
     """
-    return documents.Program(id=program_id)
+    program = documents.Program.objects(id=program_id).first()
+    return schemas.ProgramDisplay.from_doc(program)
 
 @router.patch("/", response_model=schemas.ProgramDisplay)
-def update_program(update_data: schemas.ProgramUpdate, program_name: str = None, program_id: int = None): # update_data=Body(schemas.ProgramUpdate)):
+def update_program(update_data: schemas.ProgramUpdate, program_name: str = None, program_id: OID = None): # update_data=Body(schemas.ProgramUpdate)):
     program = program_crud.update_program(update_data, program_name, program_id)
     return schemas.ProgramDisplay.from_mongo(program.to_mongo().to_dict())
+    # gadfdaf
