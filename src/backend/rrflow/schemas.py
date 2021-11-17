@@ -24,7 +24,6 @@ class FlowItemBase(MongoModel):
     last_modified_time: Optional[datetime]
 
 class FlowItem(FlowItemBase):
-    id: OID
     program_id: Optional[OID]
     pass
 
@@ -74,7 +73,7 @@ class ProgramDisplay(MongoModel):
     id: OID
     name: str
     description: str
-    flow_items: List[FlowItemDisplay]
+    flow_items: Optional[List[FlowItem]]
 
     @staticmethod
     def from_doc(item_input: documents.Program):
