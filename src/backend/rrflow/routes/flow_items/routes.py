@@ -71,7 +71,7 @@ def get_flow_item(flow_item_id: OID):
         raise HTTPException(
             status_code=404, detail="FlowItem not found"
         )  # pragma: no cover
-    return schemas.FlowItem.from_doc(flow_item)
+    return schemas.FlowItemDisplay.from_doc(flow_item)
 
 
 @router.post("/")
@@ -103,9 +103,9 @@ def create_flow_item(*,
     - **start_time**: sets the start time of the FlowItem
     - **end_time**: sets the end time of the FlowItem (could be merged date or closed date depending on metric needs for the specified FlowItem category)
     - **sum_active**: sum of time where the FlowItem was in the active state
-    - **activity_state**: boolean value for activity state (0 for inactive, 1 for active)
+    - **active_state**: boolean value for activity state (0 for inactive, 1 for active)
     - **comments**: string to hold comments about the FlowItem
-    - **last_modified_time**: datetime for when the item was last modified
+    - **last_state_change_date**: datetime for when the item was last modified
     - **program_id**: sets program the FlowItem belongs to
     """
 
@@ -164,7 +164,7 @@ def delete_flow_item(
 
 @router.patch("/{flow_item_id}")
 def update_flow_item(
-    flow_item_id: int,
+    flow_item_id: OID,
     flow_item_data: schemas.FlowItemUpdate,
     program_auth_token: str = Header(...),
 ):
@@ -197,9 +197,9 @@ def update_flow_item(
     - **start_time**: sets the start time of the FlowItem
     - **end_time**: sets the end time of the FlowItem (could be merged date or closed date depending on metric needs for the specified FlowItem category)
     - **sum_active**: sum of time where the FlowItem was in the active state
-    - **activity_state**: boolean value for activity state (0 for inactive, 1 for active)
+    - **active_state**: boolean value for activity state (0 for inactive, 1 for active)
     - **comments**: string to hold comments about the FlowItem
-    - **last_modified_time**: datetime for when the item was last modified
+    - **last_state_change_date**: datetime for when the item was last modified
     - **program_id**: sets program the FlowItem belongs to
     """
     updated_flow_item = crud.update_flow_item(

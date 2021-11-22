@@ -28,7 +28,7 @@ class MongoModel(BaseModel):
       """We must convert _id into "id". """
       if not data:
           return data
-      id = data.pop('_id', None)
+      id = data.pop('_id')
       return cls(**dict(data, id=id))
 
   def mongo(self, **kwargs):

@@ -19,9 +19,9 @@ class FlowItemBase(MongoModel):
     start_time:         Optional[datetime]
     end_time:           Optional[datetime]
     sum_active:         Optional[float]
-    activity_state:     Optional[bool]
+    active_state:     Optional[bool]
     comments:           Optional[str]
-    last_modified_time: Optional[datetime]
+    last_state_change_date: Optional[datetime]
 
 class FlowItem(FlowItemBase):
     program_id: Optional[OID]
@@ -39,9 +39,9 @@ class FlowItemDisplay(FlowItemBase):
     start_time: Optional[datetime]
     end_time: Optional[datetime]
     sum_active: Optional[float]
-    activity_state: Optional[bool]
+    active_state: Optional[bool]
     comments: Optional[str]
-    last_modified_time: Optional[datetime]
+    last_state_change_date: Optional[datetime]
     program_id: Optional[OID]
 
     @staticmethod

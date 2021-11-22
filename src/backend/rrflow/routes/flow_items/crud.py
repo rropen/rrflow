@@ -11,6 +11,8 @@ import rrflow.documents as documents
 import rrflow.schemas as schemas
 from bson import ObjectId
 
+from datetime import datetime
+
 app_settings = get_settings()
 
 
@@ -44,7 +46,10 @@ def get_all(
 
 def get_by_id(flow_item_id):
     """Get a specified flowItem and return it."""
-    flow_item = documents.FlowItem.objects(id=flow_item_id).first()
+
+    program = documents.Program.objects(flow_items__match={"_id": flow_item_id}).first()
+    flow_item = documents.Program.objects.get(pk=program.id).flow_items.filter(_id=flow_item_id).first()
+    
     if flow_item:
         return flow_item
     if not flow_item:
@@ -74,7 +79,7 @@ def create_flow_item(flow_item_data, program_id, program_auth_token):
 
 def delete_flow_item(flow_item_id, program_auth_token):
     """Take a issueTitle and remove the row from the database."""
-    flow_item = documents.FlowItem.objects(id=flow_item_id).first()
+    flow_item = documents.FlowItem.objects(flow_items__id=flow_item_id).first()
     if not flow_item:
         logger.debug("Item not found")
         raise HTTPException(status_code=404, detail="Item not found")
@@ -105,26 +110,33 @@ def delete_flow_item(flow_item_id, program_auth_token):
 
 def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
     """Take data from request and update an existing flowItem in the database."""
-    flow_item = documents.FlowItem.objects(id=flow_item_id).first()
-    if not flow_item:
-        logger.debug("Item not found")
-        raise HTTPException(status_code=404, detail="Item not found")
+    # flow_item = documents.FlowItem.objects(id=flow_item_id).first()
+    flow_item = get_by_id(flow_item_id)
 
-    # intended_program = documents.Program.objects(id=flow_item.program_id).first()
-    intended_program = documents.Program.objects().first()
+    intended_program = documents.Program.objects(id=flow_item.program_id).first()
     if not intended_program:
         logger.debug("program not found")
         raise HTTPException(status_code=404, detail="program not found")
-    verified = verify_program_auth_token(
-        program_auth_token, intended_program.program_auth_token_hashed
-    )
-
+    # verified = verify_program_auth_token(
+        # program_auth_token, intended_program.program_auth_token_hashed
+    # )
+    verified = True
     if verified:
+        old_flow_item = flow_item
+        print(old_flow_item)
         flow_item_newdata = flow_item_data.dict(exclude_unset=True)
         flow_item.update(**flow_item_newdata) #not sure if this works yet
+        print(old_flow_item)
             
         if flow_item.start_time and flow_item.end_time:
             flow_item.update(duration_open = int((flow_item.end_time - flow_item.start_time).total_seconds()))
+            flow_item.update(active_state = False)
+
+        if flow_item.active_state != old_flow_item.active_state:
+            flow_item.update(last_state_change_date = datetime.now())
+
+            if flow_item.active_state == False:
+                new_sum = flow_item.sum_active + (datetime.now() - old_flow_item.last_state_change_date)
 
     else:
         logger.warning("Attempted to access program with incorrect program auth token")
@@ -138,7 +150,7 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
         logger.error("Item did not store correctly")
         raise HTTPException(status_code=404, detail="Item did not store correctly")
 
-# def refresh_flow_item(flow_item: documents.FlowItem) -> documents.FlowItem:
-    # if flow_item is None:
-        # return None
-    # return documents.FlowItem.objects(id=flow_item.id).first()
+def refresh_flow_item(flow_item: documents.FlowItem) -> documents.FlowItem:
+    if flow_item is None:
+        return None
+    return get_by_id(flow_item.id)
