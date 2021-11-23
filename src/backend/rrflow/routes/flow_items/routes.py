@@ -116,7 +116,7 @@ def create_flow_item(*,
     )
 
     print(new_flow_item_success)
-    print(new_flow_item_success._id)
+    print(new_flow_item_success.uid)
     if new_flow_item_success:
         return schemas.FlowItemDisplay.from_doc(new_flow_item_success)
     else:
@@ -209,7 +209,7 @@ def update_flow_item(
     if update_flow_item:
         return {
             "code": "success",
-            "id": updated_flow_item.id,
+            "id": str(updated_flow_item.uid),
         }
     else:
         logger.error("Updated flowitem not stored")

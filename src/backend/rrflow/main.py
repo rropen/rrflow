@@ -1,15 +1,12 @@
 # CD to backend > source env/Scripts/activate > pip install -r requirements.txt  > uvicron main:app --reload
 # UI http://127.0.0.1:8000/docs http://127.0.0.1:8000/openapi.json
 from fastapi import FastAPI, Depends
-from fastapi.security import HTTPBearer
-from sqlmodel import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 import os
-import logging
-from opencensus.ext.azure.log_exporter import AzureLogHandler
 from rrflow.routes.flow_items import routes as flow_items
 from rrflow.routes.programs import routes as programs
+from rrflow.routes.metrics import routes as metrics
 from rrflow.routes.utilities import routes as utilities
 # from rrflow.routes.graphql.routes import query
 from rrflow.routes import root
@@ -62,6 +59,7 @@ app.add_middleware(
 app.include_router(root.router, prefix="", tags=["root"])
 app.include_router(flow_items.router, prefix="/flowItems", tags=["flowItems"])
 app.include_router(programs.router, prefix="/programs", tags=["programs"])
+app.include_router(metrics.router, prefix="/metrics", tags=["metrics"])
 app.include_router(utilities.router, prefix="/utilities", tags=["utilities"])
 # app.include_router(utilities.router, prefix="/utilities", tags=["utilities"])
 # app.mount("/graph", GraphQLApp(query, on_get=make_graphiql_handler()))

@@ -19,10 +19,12 @@ class FlowItemCategory(str, Enum):
     RISK     = "risk"
 
 class FlowItem(mongoengine.EmbeddedDocument):
-    _id = mongoengine.ObjectIdField(default=ObjectId())
+    uid = mongoengine.ObjectIdField(required=True, default=ObjectId, unique=True, primary_key=True)
+    # _id = mongoengine.ObjectIdField(default=ObjectId())
     category = mongoengine.EnumField(FlowItemCategory)
     start_time = mongoengine.DateField()
     end_time   = mongoengine.DateField()
+    duration_open = mongoengine.FloatField()
     sum_active = mongoengine.FloatField()
     active_state = mongoengine.BooleanField()
     comments = mongoengine.StringField()

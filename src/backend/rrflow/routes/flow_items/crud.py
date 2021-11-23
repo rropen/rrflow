@@ -47,8 +47,9 @@ def get_all(
 def get_by_id(flow_item_id):
     """Get a specified flowItem and return it."""
 
-    program = documents.Program.objects(flow_items__match={"_id": flow_item_id}).first()
-    flow_item = documents.Program.objects.get(pk=program.id).flow_items.filter(_id=flow_item_id).first()
+    program = documents.Program.objects(flow_items__match={"uid": flow_item_id}).first()
+    # program = documents.Program.objects(flow_items__match={"uid": flow_item_id}).first()
+    flow_item = documents.Program.objects.get(pk=program.id).flow_items.filter(uid=flow_item_id).first()
     
     if flow_item:
         return flow_item
@@ -113,8 +114,8 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
     # flow_item = documents.FlowItem.objects(id=flow_item_id).first()
     flow_item = get_by_id(flow_item_id)
 
-    intended_program = documents.Program.objects(id=flow_item.program_id).first()
-    if not intended_program:
+    program = documents.Program.objects(id=flow_item.program_id).first()
+    if not program:
         logger.debug("program not found")
         raise HTTPException(status_code=404, detail="program not found")
     # verified = verify_program_auth_token(
@@ -124,19 +125,59 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
     if verified:
         old_flow_item = flow_item
         print(old_flow_item)
-        flow_item_newdata = flow_item_data.dict(exclude_unset=True)
-        flow_item.update(**flow_item_newdata) #not sure if this works yet
-        print(old_flow_item)
+
+        flow_item_new_data = flow_item_data.dict(exclude_unset=True)
+        
+        flow_item_index = program.flow_items.index(flow_item)
+
+        # update_dict = {
+        #     f'set__flow_items__{flow_item_index}__category'     :    flow_item_new_data["category"],
+        #     f'set__flow_items__{flow_item_index}__start_time'   :    flow_item_new_data["start_time"],
+        #     f'set__flow_items__{flow_item_index}__end_time'     :    flow_item_new_data["end_time"],
+        #     f'set__flow_items__{flow_item_index}__sum_active'   :    flow_item_new_data["sum_active"],
+        #     f'set__flow_items__{flow_item_index}__active_state' :    flow_item_new_data["active_state"],
+        #     f'set__flow_items__{flow_item_index}__comments'     :    flow_item_new_data["comments"],
+        #     f'set__flow_items__{flow_item_index}__last_state_change_date' :flow_item_new_data["last_state_change_date"],
+        #     f'set__flow_items__{flow_item_index}__program_id'   :    flow_item_new_data["program_id"],
+        # }
+
+        update_dict = {}
+
+        print(flow_item_new_data)
+        if "category" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__category'     :    flow_item_new_data["category"]})
+        if "start_time" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__start_time'   :    flow_item_new_data["start_time"]})
+        if "end_time" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__end_time'     :    flow_item_new_data["end_time"]})
+        if "duration_open" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__duration_open':    flow_item_new_data["duration_open"]})
+        if "sum_active" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__sum_active'   :    flow_item_new_data["sum_active"]})
+        if "active_state" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__active_state' :    flow_item_new_data["active_state"]})
+        if "comments" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__comments'     :    flow_item_new_data["comments"]})
+        if "last_state_change_date" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__last_state_change_date' :flow_item_new_data["last_state_change_date"]})
+        if "program_id" in flow_item_new_data:
+            update_dict.update({f'set__flow_items__{flow_item_index}__program_id'   :    flow_item_new_data["program_id"]})
             
+        program.update(**update_dict)
+
         if flow_item.start_time and flow_item.end_time:
-            flow_item.update(duration_open = int((flow_item.end_time - flow_item.start_time).total_seconds()))
-            flow_item.update(active_state = False)
+            program.update(**{f'set__flow_items__{flow_item_index}__duration_open' : int((flow_item.end_time - flow_item.start_time).total_seconds())})
+            program.update(**{f'set__flow_items__{flow_item_index}__active_state' : False}) # Stack Overflow
+            # flow_item.update(duration_open = int((flow_item.end_time - flow_item.start_time).total_seconds()))
+            # flow_item.update(active_state = False)
 
         if flow_item.active_state != old_flow_item.active_state:
-            flow_item.update(last_state_change_date = datetime.now())
+            program.update(set__flow_items__S__last_state_change_date = datetime.now()) # Stack Overflow
+            # flow_item.update(last_state_change_date = datetime.now())
 
             if flow_item.active_state == False:
                 new_sum = flow_item.sum_active + (datetime.now() - old_flow_item.last_state_change_date)
+                program.update(set__flow_items__S__sum_active = new_sum) # Stack Overflow
 
     else:
         logger.warning("Attempted to access program with incorrect program auth token")
@@ -153,4 +194,4 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
 def refresh_flow_item(flow_item: documents.FlowItem) -> documents.FlowItem:
     if flow_item is None:
         return None
-    return get_by_id(flow_item.id)
+    return get_by_id(flow_item.uid)
