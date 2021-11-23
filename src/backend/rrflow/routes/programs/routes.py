@@ -77,4 +77,3 @@ def get_program_by_id (program_id: OID):
 def update_program(update_data: schemas.ProgramUpdate, program_name: str = None, program_id: OID = None): # update_data=Body(schemas.ProgramUpdate)):
     program = program_crud.update_program(update_data, program_name, program_id)
     return schemas.ProgramDisplay.from_mongo(program.to_mongo().to_dict())
-    # gadfdaf

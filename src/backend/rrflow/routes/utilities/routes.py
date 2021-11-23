@@ -15,7 +15,7 @@ router = APIRouter()
 
 # Since  FlowItem has no name, use database id to delete item
 @router.delete("/")
-def delete_flow_item():
+def clear_database():
     try:
         database.drop_all()
         return {

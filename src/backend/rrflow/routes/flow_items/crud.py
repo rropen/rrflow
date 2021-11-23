@@ -47,8 +47,8 @@ def get_all(
 def get_by_id(flow_item_id):
     """Get a specified flowItem and return it."""
 
+    # flow_item = documents.Program.objects(flow_items__match={"uid": flow_item_id})
     program = documents.Program.objects(flow_items__match={"uid": flow_item_id}).first()
-    # program = documents.Program.objects(flow_items__match={"uid": flow_item_id}).first()
     flow_item = documents.Program.objects.get(pk=program.id).flow_items.filter(uid=flow_item_id).first()
     
     if flow_item:
@@ -80,26 +80,32 @@ def create_flow_item(flow_item_data, program_id, program_auth_token):
 
 def delete_flow_item(flow_item_id, program_auth_token):
     """Take a issueTitle and remove the row from the database."""
-    flow_item = documents.FlowItem.objects(flow_items__id=flow_item_id).first()
+    flow_item = get_by_id(flow_item_id)
     if not flow_item:
         logger.debug("Item not found")
         raise HTTPException(status_code=404, detail="Item not found")
 
-    intended_program = documents.Program.objects(id=flow_item.program_id).first()
-    if not intended_program:
+    program = documents.Program.objects(id=flow_item.program_id).first()
+    if not program:
         logger.debug("program not found")
         raise HTTPException(status_code=404, detail="program not found")
-    verified = verify_program_auth_token(
-        program_auth_token, intended_program.program_auth_token_hashed
-    )
+    # verified = verify_program_auth_token(
+    #     program_auth_token, program.program_auth_token_hashed
+    # )
+
+    # VVV TODO: Real Authentication
+    verified = True
     if verified:
-        flow_item.delete()
+        # flow_item.delete()
+        program.flow_items.remove(flow_item)
+        program.save()
     else:
         logger.warning("Attempted to access program with incorrect program auth token")
         raise HTTPException(status_code=401, detail="Credentials are incorrect")
 
     # Check our work
     row = refresh_flow_item(flow_item)
+    print(row)
     if row:
         logger.error("Item did not delete correctly")
         raise HTTPException(
@@ -121,6 +127,8 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
     # verified = verify_program_auth_token(
         # program_auth_token, intended_program.program_auth_token_hashed
     # )
+
+    # VVV TODO: Real Authentication
     verified = True
     if verified:
         old_flow_item = flow_item
@@ -194,4 +202,7 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
 def refresh_flow_item(flow_item: documents.FlowItem) -> documents.FlowItem:
     if flow_item is None:
         return None
-    return get_by_id(flow_item.uid)
+    try:
+        return get_by_id(flow_item.uid)
+    except AttributeError:
+        return None

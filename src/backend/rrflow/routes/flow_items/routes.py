@@ -127,7 +127,7 @@ def create_flow_item(*,
 # Since  FlowItem has no name, use database id to delete item
 @router.delete("/{flow_item_id}")
 def delete_flow_item(
-    flow_item_id: int,
+    flow_item_id: OID,
     program_auth_token: str = Header(...)
 ):
     """

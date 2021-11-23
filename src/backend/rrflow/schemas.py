@@ -52,14 +52,14 @@ class FlowItemDisplay(FlowItemBase):
 
 ### Program ###
 class ProgramBase(MongoModel):
-    id: OID
     name: str
     description: str
-    flow_items: Optional[List[FlowItem]]
     # flow_item_ids: List[OID] <-- A different way of doing it
     
 
 class Program(ProgramBase):
+    id: OID
+    flow_items: Optional[List[FlowItem]]
     pass
 
 class ProgramCreate(ProgramBase):
@@ -68,7 +68,6 @@ class ProgramCreate(ProgramBase):
 class ProgramUpdate(MongoModel):
     name: Optional[str]
     description: Optional[str]
-    flow_items: Optional[List[FlowItem]]
     
 class ProgramDisplay(MongoModel):
     id: OID
