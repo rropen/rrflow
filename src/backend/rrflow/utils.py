@@ -3,6 +3,7 @@ import logging
 import random
 import string
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from typing import Optional
 
 from fastapi import Depends, HTTPException
@@ -140,6 +141,23 @@ def program_selector(program_name=None, program_id=None):
                 detail="Either the program_name and program_id do not match, or there is not a program with the specified details. Try passing just one of the parameters instead of both.",
             )
     else:
-        program = None
+        raise HTTPException(
+            status_code=404,
+            detail="No program selection criterion passed"
+        )
 
     return program
+
+def convert_enum_to_timedelta(option: str):
+    if option == "Day":
+        delta = timedelta(days=1)
+    elif option == "Week":
+        delta = timedelta(weeks=1)
+    elif option == "Month":
+        delta = timedelta(weeks=4)
+    elif option == "Year":
+        delta = timedelta(weeks=52)
+    else:
+        delta = None
+    
+    return delta

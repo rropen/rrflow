@@ -25,6 +25,7 @@ class FlowItemBase(MongoModel):
 
 class FlowItem(FlowItemBase):
     program_id: Optional[OID]
+    duration_open: Optional[int]
     pass
 
 class FlowItemCreate(FlowItemBase):
@@ -38,7 +39,7 @@ class FlowItemDisplay(FlowItemBase):
     category: Optional[documents.FlowItemCategory]
     start_time: Optional[datetime]
     end_time: Optional[datetime]
-    duration_open: Optional[float]
+    duration_open: Optional[int]
     sum_active: Optional[float]
     active_state: Optional[bool]
     comments: Optional[str]

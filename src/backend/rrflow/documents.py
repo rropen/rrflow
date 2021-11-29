@@ -9,6 +9,7 @@ from bson import ObjectId
 from rrflow.utility_classes import OID
 
 import mongoengine
+from mongoengine import QuerySet
 import rrflow.database as database
 
 #SRQ Difficulty Enum
@@ -22,13 +23,13 @@ class FlowItem(mongoengine.EmbeddedDocument):
     uid = mongoengine.ObjectIdField(default=ObjectId(), unique=True, primary_key=True)
     # _id = mongoengine.ObjectIdField(default=ObjectId())
     category = mongoengine.EnumField(FlowItemCategory)
-    start_time = mongoengine.DateField()
-    end_time   = mongoengine.DateField()
-    duration_open = mongoengine.FloatField()
+    start_time = mongoengine.DateTimeField()
+    end_time   = mongoengine.DateTimeField()
+    duration_open = mongoengine.IntField()
     sum_active = mongoengine.FloatField()
     active_state = mongoengine.BooleanField()
     comments = mongoengine.StringField()
-    last_state_change_date = mongoengine.DateField() # not sure why we need this 
+    last_state_change_date = mongoengine.DateTimeField() # not sure why we need this 
     program_id = mongoengine.ObjectIdField()
 
 
@@ -39,3 +40,5 @@ class Program(mongoengine.Document):
     # flow_item_ids = mongoengine.ListField(mongoengine.ObjectIdField()) <--- A different way of doing it
 
     meta = {"db_alias": database.alias, "collection": "programs"}
+    
+    

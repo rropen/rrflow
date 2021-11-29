@@ -68,6 +68,12 @@ def create_flow_item(flow_item_data, program_id, program_auth_token):
 
     flow_item_to_store = flow_item_data.dict() 
     flow_item_to_store["program_id"] = program_id
+    
+    if flow_item_to_store["end_time"]:
+        flow_item_to_store["duration_open"] = int((flow_item_to_store["end_time"] - flow_item_to_store["start_time"]).total_seconds())
+        if flow_item_to_store["duration_open"] < 0:
+            raise AssertionError("Start time is later than end time")
+        flow_item_to_store["active_state"] = False
     flow_item_db = documents.FlowItem(**flow_item_to_store)
     
     # Embed the FlowItem document to the correct program document
