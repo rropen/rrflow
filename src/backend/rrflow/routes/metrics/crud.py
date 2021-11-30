@@ -67,6 +67,7 @@ def flow_load(program: documents.Program):
     for category in FlowItemCategory:
         response[category] = categories.count(category)
     
+    response = {"metric": "load", "units": "number of flow items", "currentLoad": response}
     return response
 
 def flow_master(program: documents.Program, period: timedelta, duration: timedelta, metric_select: str):
@@ -76,6 +77,14 @@ def flow_master(program: documents.Program, period: timedelta, duration: timedel
 
     in_duration = duration_filter(program, duration)
     buckets =  bucket_closed_by_period(in_duration, period, duration)
+    if metric_select.lower() == "velocity":
+        unit_type = "number of flow items"
+    elif metric_select.lower() == "time":
+        unit_type = "seconds"
+    elif metric_select.lower() == "efficiency":
+        unit_type = "percentage of flow time spent in active state"
+    elif metric_select.lower() == "distribution":
+        unit_type = "percentage of flow items in bucket"
     
     for bucket in buckets:
         flow_items = bucket.pop("flow_items")
@@ -93,5 +102,5 @@ def flow_master(program: documents.Program, period: timedelta, duration: timedel
                 elif metric_select.lower() == "distribution":
                     bucket[category] = len(items_in_category) / len(flow_items)
                 
-    response = {"Metric": metric_select, "Buckets": buckets}
+    response = {"metric": metric_select, "units": unit_type, "buckets": buckets}
     return response

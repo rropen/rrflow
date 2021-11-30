@@ -19,7 +19,7 @@ class FlowItemBase(MongoModel):
     start_time:         Optional[datetime]
     end_time:           Optional[datetime]
     sum_active:         Optional[float]
-    active_state:     Optional[bool]
+    active_state:       Optional[bool]
     comments:           Optional[str]
     last_state_change_date: Optional[datetime]
 
@@ -83,3 +83,13 @@ class ProgramDisplay(MongoModel):
         disp_prog = ProgramDisplay.from_mongo(input_dict)        
         
         return disp_prog
+    
+class CoreMetricDisplay(MongoModel):
+    metric: str
+    units: str
+    buckets: List[dict]
+
+class LoadMetricDisplay(MongoModel):
+    metric: str
+    units: str
+    currentLoad: dict

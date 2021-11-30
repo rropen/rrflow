@@ -4,7 +4,8 @@ import fastapi
 from fastapi import APIRouter, Depends, Query, Body
 from fastapi.params import Depends
 from typing import List
-import rrflow.schemas   as schemas
+import rrflow.schemas as schemas
+from rrflow.schemas import CoreMetricDisplay, LoadMetricDisplay 
 import rrflow.documents as documents
 import rrflow.routes.programs.crud as program_crud
 import rrflow.routes.flow_items.crud as item_crud
@@ -106,7 +107,7 @@ class Time_Params:
     # return response
 
 
-@router.get("/velocity")
+@router.get("/velocity", response_model=CoreMetricDisplay)
 def flow_velocity(t_params: Time_Params = Depends(), p_params: Program_Params = Depends()):
     """
     ## Get Flow Velocity
@@ -118,7 +119,7 @@ def flow_velocity(t_params: Time_Params = Depends(), p_params: Program_Params = 
     response = metric_crud.flow_master(p_params.program, t_params.period, t_params.duration, metric_select="velocity")
     return response
 
-@router.get("/time")
+@router.get("/time", response_model=CoreMetricDisplay)
 def flow_time(t_params: Time_Params = Depends(), p_params: Program_Params= Depends()):
     """
     ## Get Flow Time
@@ -130,7 +131,7 @@ def flow_time(t_params: Time_Params = Depends(), p_params: Program_Params= Depen
     response = metric_crud.flow_master(p_params.program, t_params.period, t_params.duration, metric_select="time")
     return response
 
-@router.get("/efficiency")
+@router.get("/efficiency", response_model=CoreMetricDisplay)
 def flow_efficiency(t_params: Time_Params = Depends(), p_params: Program_Params= Depends()):
     """
     ## Gets Flow Efficiency
@@ -141,7 +142,7 @@ def flow_efficiency(t_params: Time_Params = Depends(), p_params: Program_Params=
     response = metric_crud.flow_efficiency(p_params.program, t_params.period, t_params.duration, metric_select="efficiency")
     return response
 
-@router.get("/load")
+@router.get("/load", response_model=LoadMetricDisplay)
 def flow_load(p_params: Program_Params= Depends()):
     """
     ## Get Flow Load
@@ -152,7 +153,7 @@ def flow_load(p_params: Program_Params= Depends()):
     response = metric_crud.flow_load(p_params.program)
     return response
 
-@router.get("/distribution")
+@router.get("/distribution", response_model=CoreMetricDisplay)
 def flow_distribution(t_params: Time_Params = Depends(), p_params: Program_Params= Depends()):
     """
     ## Get Flow Distribution

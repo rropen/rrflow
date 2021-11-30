@@ -11,8 +11,6 @@ import rrflow.documents as documents
 import rrflow.routes.flow_items.crud as flow_item_crud
 from rrflow.utility_classes import OID
 
-# TODO: Fix the creation of flow_items when none given in the create program 
-# (currently creates a flow_item embed. document with id of null, which will duplicated when a new program is created afterwards)
 def create_program(program_input: schemas.ProgramCreate) -> documents.Program:
     new_program = documents.Program(**program_input.dict())
     new_program.save()
