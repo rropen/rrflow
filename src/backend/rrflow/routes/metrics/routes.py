@@ -13,27 +13,27 @@ from rrflow.utility_classes import OID
 
 router = fastapi.APIRouter()
 
-class Metric_Params:
-    """
-    Custom parameter class for GET flow metric routes.
-    This format enables a custom description field for each parameter that will display
-    in the backend swagger docs.
-    """
-    class Metric_Enum(str, Enum):
-        VELOCITY = "Velocity"
-        TIME = "Time"
-        EFFICIENCY = "Efficiency"
-        DISTRIBUTION = "Distribution"
+# class Metric_Params:
+    # """
+    # Custom parameter class for GET flow metric routes.
+    # This format enables a custom description field for each parameter that will display
+    # in the backend swagger docs.
+    # """
+    # class Metric_Enum(str, Enum):
+        # VELOCITY = "Velocity"
+        # TIME = "Time"
+        # EFFICIENCY = "Efficiency"
+        # DISTRIBUTION = "Distribution"
 
-    def __init__(
-        self,
-        metric: Metric_Enum = Query(
-            "Velocity",
-            description="This parameter selects the metric data to return.",
-        ),
-    ):
+    # def __init__(
+        # self,
+        # metric: Metric_Enum = Query(
+            # "Velocity",
+            # description="This parameter selects the metric data to return.",
+        # ),
+    # ):
 
-        self.metric = metric
+        # self.metric = metric
 class Program_Params:
     """
     Custom parameter class for GET flow metric routes.
@@ -94,16 +94,16 @@ class Time_Params:
         self.period = period
         self.duration = duration
         
-@router.get("/")
-def flow_metrics(t_params: Time_Params = Depends(), p_params: Program_Params = Depends(), m_params: Metric_Params = Depends()):
-    """
-    ## Get Flow Metrics
+# @router.get("/")
+# def flow_metrics(t_params: Time_Params = Depends(), p_params: Program_Params = Depends(), m_params: Metric_Params = Depends()):
+    # """
+    # ## Get Flow Metrics
 
-    ---
-    Query Parameters:
-    """
-    response = metric_crud.flow_master(p_params.program, t_params.period, t_params.duration, m_params.metric)
-    return response
+    # ---
+    # Query Parameters:
+    # """
+    # response = metric_crud.flow_master(p_params.program, t_params.period, t_params.duration, m_params.metric)
+    # return response
 
 
 @router.get("/velocity")
