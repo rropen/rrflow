@@ -3,9 +3,10 @@ from rrflow.logger import create_logger
 from rrflow.config import get_settings
 from rrflow.utility_classes import OID
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Path, Header
+from fastapi import APIRouter, HTTPException, Path, Header, Depends
 import logging
 import rrflow.schemas as schemas
+from rrflow.dependencies import Program_Params
 
 app_settings = get_settings()
 
@@ -18,8 +19,7 @@ router = APIRouter()
 def get_flow_items(
     skip: int = 0,
     limit: int = 100,
-    program_id: Optional[OID] = None,
-    program_name: Optional[str] = None
+    p_params: Program_Params = Depends()
 ):
     """
     ## Get FlowItems
@@ -36,7 +36,7 @@ def get_flow_items(
     - **program_name**: specifying **program_name** returns only flow items in a given program
     """
     flow_docs = crud.get_all(
-        skip=skip, limit=limit, program_id=program_id, program_name=program_name
+        skip=skip, limit=limit, program=p_params.program
     )
 
     if not flow_docs:
@@ -78,7 +78,7 @@ def get_flow_item(flow_item_id: OID):
 def create_flow_item(*,
     flow_item_data: schemas.FlowItemCreate,
     program_auth_token: str = Header(None),
-    program_id: OID
+    p_params: Program_Params = Depends()
 ):
     """
     ## Create FlowItem entry in db
@@ -112,7 +112,7 @@ def create_flow_item(*,
     # Creates the database row and stores it in the table
 
     new_flow_item_success = crud.create_flow_item(
-        flow_item_data, program_id, program_auth_token
+        flow_item_data, p_params.program, program_auth_token
     )
 
     print(new_flow_item_success)
@@ -124,42 +124,6 @@ def create_flow_item(*,
         raise HTTPException(status_code=500, detail="Row not created")
 
 
-# Since  FlowItem has no name, use database id to delete item
-@router.delete("/{flow_item_id}")
-def delete_flow_item(
-    flow_item_id: OID,
-    program_auth_token: str = Header(...)
-):
-    """
-    ## Delete a FlowItem
-
-    Pass a FlowItem database id value in the path and the FlowItem will be deleted from the database.
-
-    ---
-
-    Path Parameters:
-
-    - **flow_item_id**: selects FlowItem being open
-
-    ---
-
-    Request Headers:
-
-    - **program_auth_token**: authentication key to allow for major changes to occur to program data (specific to the FlowItem's program)
-    """
-    response = crud.delete_flow_item(flow_item_id, program_auth_token)
-
-    if response:
-        return {
-            "code": "success",
-            "message": "FlowItem {} Deleted".format(flow_item_id),
-        }
-    else:  # pragma: no cover
-        logger.error("FlowItem not deleted")
-        return {
-            "code": "error",
-            "message": "FlowItem not deleted or multiple FlowItems with same flow_item_id existed.",
-        }
 
 
 @router.patch("/{flow_item_id}")
@@ -214,3 +178,40 @@ def update_flow_item(
     else:
         logger.error("Updated flowitem not stored")
         return {"code": "error", "message": "Row not updated"}  # pragma: no cover
+
+# Since  FlowItem has no name, use database id to delete item
+@router.delete("/{flow_item_id}")
+def delete_flow_item(
+    flow_item_id: OID,
+    program_auth_token: str = Header(...)
+):
+    """
+    ## Delete a FlowItem
+
+    Pass a FlowItem database id value in the path and the FlowItem will be deleted from the database.
+
+    ---
+
+    Path Parameters:
+
+    - **flow_item_id**: selects FlowItem being open
+
+    ---
+
+    Request Headers:
+
+    - **program_auth_token**: authentication key to allow for major changes to occur to program data (specific to the FlowItem's program)
+    """
+    response = crud.delete_flow_item(flow_item_id, program_auth_token)
+
+    if response:
+        return {
+            "code": "success",
+            "message": "FlowItem {} Deleted".format(flow_item_id),
+        }
+    else:  # pragma: no cover
+        logger.error("FlowItem not deleted")
+        return {
+            "code": "error",
+            "message": "FlowItem not deleted or multiple FlowItems with same flow_item_id existed.",
+        }

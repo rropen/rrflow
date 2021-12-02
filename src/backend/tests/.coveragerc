@@ -1,5 +1,5 @@
 [run]
-source = sfm
+source = rrflow
 omit = __pypackages__
 
 [report]

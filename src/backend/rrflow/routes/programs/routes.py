@@ -1,12 +1,15 @@
+from rrflow.logger import create_logger
 from rrflow import utils
 import fastapi
-from fastapi import APIRouter, Depends, Query, Body
-from fastapi.params import Depends
+from fastapi import APIRouter, Depends, Query, Body, Header
 from typing import List
 import rrflow.schemas   as schemas
 import rrflow.documents as documents
 import rrflow.routes.programs.crud as program_crud
 from rrflow.utility_classes import OID
+from rrflow.dependencies import Program_Params
+
+logger = create_logger(__name__)
 
 router = fastapi.APIRouter()
 
@@ -65,15 +68,32 @@ def get_programs(params: CustomGetParams = Depends()) -> List[schemas.ProgramDis
     
     return program_schemas
 
-@router.get("/{program_id}", response_model=schemas.ProgramDisplay)
-def get_program_by_id (program_id: OID):
+@router.get("/specific/", response_model=schemas.ProgramDisplay)
+def get_specific_program(p_params: Program_Params = Depends()):
     """
-    Gets program from database with matching id
+    Gets program from database with matching id or name
     """
-    program = documents.Program.objects(id=program_id).first()
-    return schemas.ProgramDisplay.from_doc(program)
+    # Program_Params takes query params of name or id and returns a program using program selector
+    return schemas.ProgramDisplay.from_doc(p_params.program)
 
 @router.patch("/", response_model=schemas.ProgramDisplay)
-def update_program(update_data: schemas.ProgramUpdate, program_name: str = None, program_id: OID = None): # update_data=Body(schemas.ProgramUpdate)):
-    program = program_crud.update_program(update_data, program_name, program_id)
+def update_program(update_data: schemas.ProgramUpdate, p_params: Program_Params = Depends()): # update_data=Body(schemas.ProgramUpdate)):
+    program = program_crud.update_program(update_data, p_params.program)
     return schemas.ProgramDisplay.from_mongo(program.to_mongo().to_dict())
+
+# TODO: Implement Admin_Key functionality
+@router.delete("/")
+def update_program(p_params: Program_Params = Depends(), admin_key: str = Header(None)):
+    response = program_crud.delete_program(p_params.program, admin_key)
+
+    if response:
+        return {
+            "code": "success",
+            "message": "Program {} Deleted".format(p_params.program_id),
+        }
+    else:  # pragma: no cover
+        logger.error("Program not deleted")
+        return {
+            "code": "error",
+            "message": "Program not deleted or multiple Programs with same program id exist.",
+        }

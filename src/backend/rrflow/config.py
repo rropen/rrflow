@@ -12,7 +12,7 @@ def generate_db_string(
     """Take in env variables and generate correct db string."""
 
     if ENV == "test":
-        # TODO: Unimplemented.
+        # TODO: Implement "test" environment variable db connection string
         return "mongomock://localhost"
         pass
 
@@ -22,7 +22,7 @@ def generate_db_string(
         return "mongodb://{}:{}/".format(DBHOST, DBPORT)
 
     if ENV == "development" or "production":
-        # TODO: Unimplemented.
+        # TODO: Implement "dev,prod" environment variable db connection string
         pass
 
 

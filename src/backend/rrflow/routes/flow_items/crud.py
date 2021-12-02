@@ -2,7 +2,6 @@
     CRUD for the FlowItem Embedded Document
 """
 from fastapi.exceptions import HTTPException
-from pydantic.networks import HttpUrl
 from rrflow.utils import verify_program_auth_token, program_selector
 import logging
 from rrflow.config import get_settings
@@ -19,16 +18,13 @@ app_settings = get_settings()
 logger = create_logger(__name__)
 
 
-def get_all(
+def get_all(*, 
     skip: int = 0,
     limit: int = 1000,
-    program_id: int = None,
-    program_name: str = None,
+    program: documents.Program
 ):
     """Get all the flowItems and return them."""
 
-    program = program_selector(program_name, program_id)
-    
     if program:
         return program.flow_items[skip:skip+limit]
 
@@ -58,16 +54,15 @@ def get_by_id(flow_item_id):
         raise HTTPException(status_code=404, detail="Item not found")
 
 
-def create_flow_item(flow_item_data, program_id, program_auth_token):
+def create_flow_item(flow_item_data, program: documents.Program, program_auth_token):
     """Take data from request and create a new flowItem in the database."""
-    intended_program = documents.Program.objects(id=program_id).first()
     #TODO: auth step here
-    if not intended_program:
+    if not program:
         logger.debug("program not found")
         raise HTTPException(status_code=404, detail="program not found")
 
     flow_item_to_store = flow_item_data.dict() 
-    flow_item_to_store["program_id"] = program_id
+    flow_item_to_store["program_id"] = program.id
     
     if flow_item_to_store["end_time"]:
         flow_item_to_store["duration_open"] = int((flow_item_to_store["end_time"] - flow_item_to_store["start_time"]).total_seconds())
@@ -78,8 +73,8 @@ def create_flow_item(flow_item_data, program_id, program_auth_token):
     
     # Embed the FlowItem document to the correct program document
     # VVV TODO: Check that flow_item is not a duplicate
-    intended_program.flow_items.append(flow_item_db)
-    intended_program.save()
+    program.flow_items.append(flow_item_db)
+    program.save()
 
     return flow_item_db
 
@@ -111,7 +106,6 @@ def delete_flow_item(flow_item_id, program_auth_token):
 
     # Check our work
     row = refresh_flow_item(flow_item)
-    print(row)
     if row:
         logger.error("Item did not delete correctly")
         raise HTTPException(

@@ -11,6 +11,7 @@ import rrflow.routes.programs.crud as program_crud
 import rrflow.routes.flow_items.crud as item_crud
 import rrflow.routes.metrics.crud as metric_crud
 from rrflow.utility_classes import OID
+from rrflow.dependencies import Program_Params
 
 router = fastapi.APIRouter()
 
@@ -35,25 +36,6 @@ router = fastapi.APIRouter()
     # ):
 
         # self.metric = metric
-class Program_Params:
-    """
-    Custom parameter class for GET flow metric routes.
-    This format enables a custom description field for each parameter that will display
-    in the backend swagger docs.
-    """
-    def __init__(
-        self,
-        program_name: str = Query(
-            None,
-            description="This parameter selects the program by name.",
-        ),
-        program_id: OID= Query(
-            None,
-            description="This parameter selects the program by ID.",
-        ),
-    ):
-
-        self.program = utils.program_selector(program_name, program_id)
 
 class Time_Params:
     """

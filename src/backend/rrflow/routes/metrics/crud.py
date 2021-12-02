@@ -39,9 +39,9 @@ def bucket_closed_by_period(flow_items: List[documents.FlowItem], period: timede
         raise AssertionError("Function 'bucket_closed_by_period' was passed an open flow_item")
     
     
-    initial_date = datetime.now() - duration
     buckets = []
     total_buckets = math.ceil(int(duration.days) / int(period.days))
+    initial_date = datetime.now() - total_buckets*period
     for iter in range(0, total_buckets):
         range_start = initial_date + period*iter
         range_end = initial_date + period*(iter + 1)
@@ -71,9 +71,6 @@ def flow_load(program: documents.Program):
     return response
 
 def flow_master(program: documents.Program, period: timedelta, duration: timedelta, metric_select: str):
-
-    if metric_select.lower() == "load":
-        pass #decide what to do here
 
     in_duration = duration_filter(program, duration)
     buckets =  bucket_closed_by_period(in_duration, period, duration)
