@@ -4,20 +4,12 @@
       <div>
         <div cols="4" class="d-flex justify-center align-center">
           <div class="pa-2">
-            <h3 class="pb-2">Countries in 2018 with the highest GDP</h3>
-            <p>
-              Gross domestic product by country allows you to compare the
-              economies of the nations. It measures everything produced by
-              everyone in the country whether they are citizens or foreigners.
-              The data has been taken from
-              <a
-                href="https://www.thebalance.com/gdp-by-country-3-ways-to-compare-3306012"
-                >The Balance</a
-              >.
-            </p>
+            <h3 class="pb-2">Flow Load</h3>
+            <p>Number of Flow Items that are currently open</p>
           </div>
         </div>
         <div id="arc" />
+        <div class="container mx-auto flex justify-center" id="hBar" />
       </div>
     </div>
   </div>
@@ -26,6 +18,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { Vue } from "vue-class-component";
+import { BarChart } from "../d3charts/horizontalBar.js";
 import * as d3 from "d3";
 
 const gdp = [
@@ -34,6 +27,19 @@ const gdp = [
   { country: "Germany", value: 4.0 },
   { country: "Japan", value: 4.9 },
   { country: "France", value: 2.8 },
+];
+
+const load = [
+  {
+    metric: "load",
+    units: "number of flow items",
+    currentLoad: [
+      { flowCategory: "feature", value: 2 },
+      { flowCategory: "defect", value: 1 },
+      { flowCategory: "debt", value: 4 },
+      { flowCategory: "risk", value: 3 },
+    ],
+  },
 ];
 
 function generateArc() {
@@ -93,6 +99,22 @@ function generateArc() {
 }
 
 onMounted(() => {
-  generateArc();
+  // generateArc();
+
+  const chart = BarChart(load[0].currentLoad, {
+    x: (d) => d.value,
+    y: (d) => d.flowCategory,
+    marginLeft: 60,
+    marginRight: 60,
+    yDomain: d3.groupSort(
+      load[0].currentLoad,
+      ([d]) => -d.value,
+      (d) => d.flowCategory
+    ), // sort by descending frequency
+    xLabel: `${load[0].units} →`,
+    color: "steelblue",
+  });
+
+  const svg = d3.select("#hBar").node().append(chart);
 });
 </script>
