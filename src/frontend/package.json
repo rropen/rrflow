@@ -7,6 +7,7 @@
     "serve": "vite --mode development --host 0.0.0.0 --port 3000"
   },
   "dependencies": {
+    "axios": "^0.24.0",
     "d3": "^7.1.1",
     "vue": "^3.2.16",
     "vue-router": "^4.0.12"

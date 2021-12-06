@@ -1,17 +1,30 @@
 <template>
   <div class="home">
-    <D3Dashboard />
+    <FlowVelocityChart
+      :programId="selectedProgramId"
+      :period="selectedPeriod"
+      :duration="selectedDuration"
+    />
+    <FlowTimeChart
+      :programId="selectedProgramId"
+      :period="selectedPeriod"
+      :duration="selectedDuration"
+    />
+    <FlowLoadChart
+      :programId="selectedProgramId"
+      :period="selectedPeriod"
+      :duration="selectedDuration"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Options, Vue } from "vue-class-component";
-import D3Dashboard from "../components/D3Dashboard.vue"; // @ is an alias to /src
+import { ref } from "vue";
+import FlowVelocityChart from "../components/FlowVelocityChart.vue";
+import FlowTimeChart from "../components/FlowTimeChart.vue";
+import FlowLoadChart from "../components/FlowLoadChart.vue";
 
-// @Options({
-// components: {
-// D3Dashboard,
-// },
-// })
-// export default class Home extends Vue {}
+const selectedProgramId = ref("61ad63a933d01399768faa93");
+const selectedPeriod = ref("Month");
+const selectedDuration = ref("Month");
 </script>

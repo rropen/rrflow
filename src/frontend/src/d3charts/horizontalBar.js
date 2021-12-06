@@ -23,7 +23,8 @@ export function BarChart(
     yPadding = 0.1, // amount of y-range to reserve to separate bars
     yDomain, // an array of (ordinal) y-values
     yRange, // [top, bottom]
-    color = "currentColor", // bar fill color
+    // color = "currentColor", // bar fill color
+    color = (d) => d, // bar fill color
     titleColor = "white", // title fill color when atop bar
     titleAltColor = "currentColor", // title fill color when atop background
   } = {}
@@ -93,10 +94,20 @@ export function BarChart(
 
   svg
     .append("g")
-    .attr("fill", color)
     .selectAll("rect")
     .data(I)
     .join("rect")
+    .attr("fill", function (i) {
+      if (Y[i] == "risk") {
+        return "#e2e43a";
+      } else if (Y[i] == "defect") {
+        return "#e05928";
+      } else if (Y[i] == "debt") {
+        return "#059abe";
+      } else if (Y[i] == "feature") {
+        return "#80bc00";
+      }
+    })
     .attr("x", xScale(0))
     .attr("y", (i) => yScale(Y[i]))
     .attr("width", (i) => xScale(X[i]) - xScale(0))
@@ -111,18 +122,18 @@ export function BarChart(
     .selectAll("text")
     .data(I)
     .join("text")
-    .attr("x", (i) => xScale(X[i]))
+    // .attr("x", (i) => xScale(X[i]))
     .attr("y", (i) => yScale(Y[i]) + yScale.bandwidth() / 2)
     .attr("dy", "0.35em")
     .attr("dx", -4)
-    .text(title)
-    .call((text) =>
-      text
-        .filter((i) => xScale(X[i]) - xScale(0) < 20) // short bars
-        .attr("dx", +4)
-        .attr("fill", titleAltColor)
-        .attr("text-anchor", "start")
-    );
+    .text(title);
+  // .call((text) =>
+  //   text
+  //     .filter((i) => xScale(X[i]) - xScale(0) < 20) // short bars
+  //     .attr("dx", +4)
+  //     .attr("fill", titleAltColor)
+  //     .attr("text-anchor", "start")
+  //);
 
   svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(yAxis);
 
