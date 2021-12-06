@@ -160,7 +160,7 @@ def flow_distribution(
     ---
     Query Parameters:
     """
-    response = metric_crud.flow_distribution(
+    response = metric_crud.flow_master(
         p_params.program,
         t_params.period,
         t_params.duration,
