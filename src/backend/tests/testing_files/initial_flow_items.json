@@ -1,66 +1,66 @@
 [
-    {
-        "category": "feature",
-        "start_time": "2021-11-01T12:00:00.000Z",
-        "end_time": "2021-11-06T12:00:00.000Z",
-        "duration_open": 432000,
-        "sum_active": 86400,
-        "active_state": false,
-        "comments": "Some comments"
-    },
-    {
-        "category": "feature",
-        "start_time": "2021-11-02T12:00:00.000Z",
-        "end_time": "2021-11-05T12:00:00.000Z",
-        "duration_open": 259200,
-        "sum_active": 129600,
-        "active_state": false,
-        "comments": "Some comments"
-    },
-    {
-        "category": "feature",
-        "start_time": "2021-11-04T12:00:00.000Z",
-        "sum_active": 2000,
-        "active_state": true,
-        "comments": "Some comments"
-    },
-    {
-        "category": "defect",
-        "start_time": "2021-11-01T12:00:00.000Z",
-        "end_time": "2021-11-06T12:00:00.000Z",
-        "duration_open": 432000,
-        "sum_active": 43200,
-        "active_state": false,
-        "comments": "Some comments"
-    },
-    {
-        "category": "defect",
-        "start_time": "2021-11-02T12:00:00.000Z",
-        "sum_active": 2000,
-        "active_state": true,
-        "comments": "Some comments"
-    },
-    {
-        "category": "debt",
-        "start_time": "2021-11-01T12:00:00.000Z",
-        "end_time": "2021-11-06T12:00:00.000Z",
-        "duration_open": 432000,
-        "sum_active": 21600,
-        "active_state": false,
-        "comments": "Some comments"
-    },
-    {
-        "category": "debt",
-        "start_time": "2021-11-02T12:00:00.000Z",
-        "sum_active": 2000,
-        "active_state": true,
-        "comments": "Some comments"
-    },
-    {
-        "category": "risk",
-        "start_time": "2021-11-01T12:00:00.000Z",
-        "sum_active": 2000,
-        "active_state": true,
-        "comments": "Some comments"
-    }
+  {
+    "category": "feature",
+    "start_time": "2021-11-01T12:00:00.000z",
+    "end_time": "2021-11-06T12:00:00.000z",
+    "duration_open": 432000,
+    "sum_active": 86400,
+    "active_state": false,
+    "comments": "some comments"
+  },
+  {
+    "category": "feature",
+    "start_time": "2021-11-02T12:00:00.000Z",
+    "end_time": "2021-11-05T12:00:00.000Z",
+    "duration_open": 259200,
+    "sum_active": 129600,
+    "active_state": false,
+    "comments": "Some comments"
+  },
+  {
+    "category": "feature",
+    "start_time": "2021-11-04T12:00:00.000Z",
+    "sum_active": 2000,
+    "active_state": true,
+    "comments": "Some comments"
+  },
+  {
+    "category": "defect",
+    "start_time": "2021-11-01T12:00:00.000Z",
+    "end_time": "2021-11-06T12:00:00.000Z",
+    "duration_open": 432000,
+    "sum_active": 43200,
+    "active_state": false,
+    "comments": "Some comments"
+  },
+  {
+    "category": "defect",
+    "start_time": "2021-11-02T12:00:00.000Z",
+    "sum_active": 2000,
+    "active_state": true,
+    "comments": "Some comments"
+  },
+  {
+    "category": "debt",
+    "start_time": "2021-11-01T12:00:00.000Z",
+    "end_time": "2021-11-06T12:00:00.000Z",
+    "duration_open": 432000,
+    "sum_active": 21600,
+    "active_state": false,
+    "comments": "Some comments"
+  },
+  {
+    "category": "debt",
+    "start_time": "2021-11-02T12:00:00.000Z",
+    "sum_active": 2000,
+    "active_state": true,
+    "comments": "Some comments"
+  },
+  {
+    "category": "risk",
+    "start_time": "2021-11-01T12:00:00.000Z",
+    "sum_active": 2000,
+    "active_state": true,
+    "comments": "Some comments"
+  }
 ]

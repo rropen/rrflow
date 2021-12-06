@@ -3,7 +3,7 @@ from rrflow import utils
 import fastapi
 from fastapi import APIRouter, Depends, Query, Body, Header
 from typing import List
-import rrflow.schemas   as schemas
+import rrflow.schemas as schemas
 import rrflow.documents as documents
 import rrflow.routes.programs.crud as program_crud
 from rrflow.utility_classes import OID
@@ -12,6 +12,7 @@ from rrflow.dependencies import Program_Params
 logger = create_logger(__name__)
 
 router = fastapi.APIRouter()
+
 
 class CustomGetParams:
     """Custom parameter class for the GET programs route.
@@ -35,6 +36,7 @@ class CustomGetParams:
         self.skip = skip
         self.limit = limit
 
+
 @router.post("/", response_model=schemas.ProgramDisplay)
 def create_program(program_data: schemas.ProgramCreate):
     """
@@ -43,6 +45,7 @@ def create_program(program_data: schemas.ProgramCreate):
     program = program_crud.create_program(program_data)
 
     return schemas.ProgramDisplay.from_doc(program)
+
 
 @router.get("/")
 def get_programs(params: CustomGetParams = Depends()) -> List[schemas.ProgramDisplay]:
@@ -59,14 +62,15 @@ def get_programs(params: CustomGetParams = Depends()) -> List[schemas.ProgramDis
     >When used together, *skip* and *limit* facilitate serverside pagination support.
 
     """
-    
-    program_docs = program_crud.get_programs(params.skip,params.limit)
-    
+
+    program_docs = program_crud.get_programs(params.skip, params.limit)
+
     program_schemas = []
     for doc in program_docs:
         program_schemas.append(schemas.ProgramDisplay.from_doc(doc))
-    
+
     return program_schemas
+
 
 @router.get("/specific/", response_model=schemas.ProgramDisplay)
 def get_specific_program(p_params: Program_Params = Depends()):
@@ -76,14 +80,18 @@ def get_specific_program(p_params: Program_Params = Depends()):
     # Program_Params takes query params of name or id and returns a program using program selector
     return schemas.ProgramDisplay.from_doc(p_params.program)
 
+
 @router.patch("/", response_model=schemas.ProgramDisplay)
-def update_program(update_data: schemas.ProgramUpdate, p_params: Program_Params = Depends()): # update_data=Body(schemas.ProgramUpdate)):
+def update_program(
+    update_data: schemas.ProgramUpdate, p_params: Program_Params = Depends()
+):  # update_data=Body(schemas.ProgramUpdate)):
     program = program_crud.update_program(update_data, p_params.program)
     return schemas.ProgramDisplay.from_mongo(program.to_mongo().to_dict())
 
+
 # TODO: Implement Admin_Key functionality
 @router.delete("/")
-def update_program(p_params: Program_Params = Depends(), admin_key: str = Header(None)):
+def delete_program(p_params: Program_Params = Depends(), admin_key: str = Header(None)):
     response = program_crud.delete_program(p_params.program, admin_key)
 
     if response:
