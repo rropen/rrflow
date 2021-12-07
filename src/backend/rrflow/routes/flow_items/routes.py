@@ -17,9 +17,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[schemas.FlowItemDisplay])
 def get_flow_items(
-    skip: int = 0,
-    limit: int = 100,
-    p_params: Program_Params = Depends()
+    skip: int = 0, limit: int = 100, p_params: Program_Params = Depends()
 ):
     """
     ## Get FlowItems
@@ -35,9 +33,7 @@ def get_flow_items(
     - **program_id**: specifying **program_id** returns only flow items in a given program
     - **program_name**: specifying **program_name** returns only flow items in a given program
     """
-    flow_docs = crud.get_all(
-        skip=skip, limit=limit, program=p_params.program
-    )
+    flow_docs = crud.get_all(skip=skip, limit=limit, program=p_params.program)
 
     if not flow_docs:
         raise HTTPException(
@@ -49,6 +45,7 @@ def get_flow_items(
         flow_schemas.append(schemas.FlowItemDisplay.from_doc(doc))
 
     return flow_schemas
+
 
 ### VVV TODO: Makes no sense, embedded documents do not have IDs
 @router.get("/{flow_item_id}")
@@ -75,7 +72,8 @@ def get_flow_item(flow_item_id: OID):
 
 
 @router.post("/")
-def create_flow_item(*,
+def create_flow_item(
+    *,
     flow_item_data: schemas.FlowItemCreate,
     program_auth_token: str = Header(None),
     p_params: Program_Params = Depends()
@@ -110,13 +108,11 @@ def create_flow_item(*,
     """
 
     # Creates the database row and stores it in the table
-
+    print("in route")
     new_flow_item_success = crud.create_flow_item(
         flow_item_data, p_params.program, program_auth_token
     )
-
-    print(new_flow_item_success)
-    print(new_flow_item_success.uid)
+    print("past the crud")
     if new_flow_item_success:
         return schemas.FlowItemDisplay.from_doc(new_flow_item_success)
     else:
@@ -124,13 +120,11 @@ def create_flow_item(*,
         raise HTTPException(status_code=500, detail="Row not created")
 
 
-
-
 @router.patch("/{flow_item_id}")
 def update_flow_item(
     flow_item_id: OID,
     flow_item_data: schemas.FlowItemUpdate,
-    program_auth_token: str = Header(...),
+    program_auth_token: str = Header(None),
 ):
     """
     ## Update FlowItem
@@ -179,12 +173,10 @@ def update_flow_item(
         logger.error("Updated flowitem not stored")
         return {"code": "error", "message": "Row not updated"}  # pragma: no cover
 
+
 # Since  FlowItem has no name, use database id to delete item
 @router.delete("/{flow_item_id}")
-def delete_flow_item(
-    flow_item_id: OID,
-    program_auth_token: str = Header(...)
-):
+def delete_flow_item(flow_item_id: OID, program_auth_token: str = Header(None)):
     """
     ## Delete a FlowItem
 
