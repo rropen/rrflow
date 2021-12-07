@@ -20,7 +20,6 @@
   {
     "category": "feature",
     "start_time": "2021-11-04T12:00:00.000Z",
-    "sum_active": 2000,
     "active_state": true,
     "comments": "Some comments"
   },
@@ -37,6 +36,7 @@
     "category": "defect",
     "start_time": "2021-11-02T12:00:00.000Z",
     "sum_active": 2000,
+    "last_state_change_date": "2021-11-03T12:00:00.000Z",
     "active_state": true,
     "comments": "Some comments"
   },

@@ -162,14 +162,6 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
                     ]
                 }
             )
-        if "duration_open" in flow_item_new_data:
-            update_dict.update(
-                {
-                    f"set__flow_items__{flow_item_index}__duration_open": flow_item_new_data[
-                        "duration_open"
-                    ]
-                }
-            )
         if "sum_active" in flow_item_new_data:
             update_dict.update(
                 {
@@ -194,22 +186,6 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
                     ]
                 }
             )
-        if "last_state_change_date" in flow_item_new_data:
-            update_dict.update(
-                {
-                    f"set__flow_items__{flow_item_index}__last_state_change_date": flow_item_new_data[
-                        "last_state_change_date"
-                    ]
-                }
-            )
-        if "program_id" in flow_item_new_data:
-            update_dict.update(
-                {
-                    f"set__flow_items__{flow_item_index}__program_id": flow_item_new_data[
-                        "program_id"
-                    ]
-                }
-            )
 
         program.update(**update_dict)
         program.reload()
@@ -226,12 +202,14 @@ def update_flow_item(flow_item_id, flow_item_data, program_auth_token):
             program.reload()
 
             if program.flow_items[flow_item_index].active_state == False:
-                new_sum = program.flow_items[flow_item_index].sum_active + (
-                    datetime.now() - old_flow_item.last_state_change_date
-                )
+                if old_flow_item.last_state_change_date == None:
+                    new_sum = (datetime.now() - program.flow_items[flow_item_index].start_time).total_seconds()
+                elif old_flow_item.last_state_change_date:
+                    new_sum = program.flow_items[flow_item_index].sum_active + (datetime.now() - old_flow_item.last_state_change_date).total_seconds()
                 program.update(
                     **{f"set__flow_items__{flow_item_index}__sum_active": new_sum}
                 )  # Stack Overflow
+                
                 program.reload()
 
             elif program.flow_items[flow_item_index].active_state == True:

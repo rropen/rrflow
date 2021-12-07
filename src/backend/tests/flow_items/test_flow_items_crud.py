@@ -104,5 +104,58 @@ def test_update(session, db):
     assert response.active_state == True
     assert response.last_state_change_date != flow_item.last_state_change_date
 
-    program = documents.Program.objects(name="test program 1").first()
-    flow_item = program.flow_items[0]
+    flow_item = program.flow_items[1]
+
+    flow_item_update = {
+        "category": "debt",
+        "start_time": "2021-11-06T12:00:00.000Z",
+        "end_time": "2021-11-07T12:00:00.000Z",
+        "duration_open": 80000, #should be 86400, want to see update function correct based on start and end time
+        "sum_active": 100000,
+        "active_state": False,
+        "comments": "Some new comments"
+    }
+
+    flow_item_data = FlowItemUpdate(**flow_item_update)
+    response = crud.update_flow_item(flow_item.uid, flow_item_data, "admin_key")
+
+    assert response.category == "debt"
+    assert response.start_time == datetime(2021, 11, 6, 12, 0)
+    assert response.end_time == datetime(2021, 11, 7, 12, 0)
+    assert response.duration_open == 86400
+    assert response.sum_active == 100000
+    assert response.comments == "Some new comments"
+    assert response.active_state == False
+    assert response.last_state_change_date == None
+    
+    flow_item = program.flow_items[2]
+
+    flow_item_update = {
+        "active_state": False,
+    }
+
+    flow_item_data = FlowItemUpdate(**flow_item_update)
+    response = crud.update_flow_item(flow_item.uid, flow_item_data, "admin_key")
+    
+    print(response)
+    assert response.end_time == None
+    assert response.duration_open == None
+    assert response.sum_active > 0
+    assert response.active_state == False
+    assert response.last_state_change_date.date() == datetime.now().date()
+    
+    flow_item = program.flow_items[4]
+
+    flow_item_update = {
+        "active_state": False,
+    }
+
+    flow_item_data = FlowItemUpdate(**flow_item_update)
+    response = crud.update_flow_item(flow_item.uid, flow_item_data, "admin_key")
+    
+    print(response)
+    assert response.end_time == None
+    assert response.duration_open == None
+    assert response.sum_active > 2000
+    assert response.active_state == False
+    assert response.last_state_change_date.date() == datetime.now().date()
