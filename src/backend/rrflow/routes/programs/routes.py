@@ -93,7 +93,6 @@ def update_program(
 @router.delete("/")
 def delete_program(p_params: Program_Params = Depends(), admin_key: str = Header(None)):
     response = program_crud.delete_program(p_params.program, admin_key)
-
     if response:
         return {
             "code": "success",

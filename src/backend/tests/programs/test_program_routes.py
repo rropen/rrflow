@@ -45,4 +45,11 @@ def test_patch_program_update(client, session, db):
     assert len(response.json()["flow_items"]) == 8
 
 
-# TODO: test_delete_program_route
+def test_delete_program(client, session, db):
+    response = client.delete(
+        "/programs/",
+        params={"program_name": "test program 1", "admin_key": "admin-key"},
+    )
+    assert response.status_code == 200
+    assert response.json()["code"] == "success"
+    assert response.json()["message"] != None

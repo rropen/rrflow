@@ -27,7 +27,7 @@ print(
 db = mongoengine.connect(app_settings.DBNAME, host=app_settings.CONN_STR, alias=alias)
 
 # TODO: Delete this method before production:
-def drop_all():
+def drop_all():  # pragma: no cover
     if app_settings.ENV != "production":
         db.drop_database(app_settings.DBNAME)
         return

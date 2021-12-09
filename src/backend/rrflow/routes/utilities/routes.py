@@ -3,6 +3,7 @@ from rrflow.logger import create_logger
 from rrflow.config import get_settings
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Path, Header
+from mongoengine import OperationError
 import logging
 import rrflow.schemas as schemas
 import rrflow.database as database
@@ -15,14 +16,11 @@ router = APIRouter()
 
 # Since  FlowItem has no name, use database id to delete item
 @router.delete("/")
-def clear_database():
+def clear_database():  # pragma: no cover
     try:
         database.drop_all()
-        return {
-            "code": "success",
-            "message": "Database cleared"
-        }
-    except:
+        return {"code": "success", "message": "Database cleared"}
+    except OperationError:
         logger.error("Database not cleared")
         return {
             "code": "error",

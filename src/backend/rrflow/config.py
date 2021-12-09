@@ -8,7 +8,7 @@ load_dotenv()
 
 def generate_db_string(
     ENV: str, DBHOST: str, DBPORT: str, DBNAME: str, DBUSER: str, DBPASS: str
-):
+):  # pragma: no cover
     """Take in env variables and generate correct db string."""
 
     if ENV == "test":
