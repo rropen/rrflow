@@ -1,7 +1,7 @@
 from rrflow import utils
 from enum import Enum
 import fastapi
-from fastapi import APIRouter, Depends, Query, Body
+from fastapi import APIRouter, Depends, Query, Body, HTTPException
 from typing import List
 import rrflow.schemas as schemas
 from rrflow.schemas import CoreMetricDisplay, LoadMetricDisplay
@@ -67,6 +67,7 @@ class Time_Params:
             description="This parameter sets the amount of time in the past to present the metrics for",
         ),
     ):
+
         # Convert query params into timedeltas to be used in CRUD functions
         period = utils.convert_enum_to_timedelta(period)
         duration = utils.convert_enum_to_timedelta(duration)

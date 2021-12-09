@@ -59,13 +59,3 @@ def delete_program(program: documents.Program, admin_key):
         )  # row didn't successfully delete or another one exists
     else:
         return True
-
-
-def refresh_program(program: documents.Program) -> documents.Program:
-    if program is None:
-        return None
-    try:
-        return program_selector(program_id=program.id)
-    except AttributeError:
-        return None
-    pass

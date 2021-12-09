@@ -131,7 +131,9 @@ def program_selector(program_name=None, program_id=None):
                 detail=f"No program found with the specified id: {program_id}",
             )
     elif program_id and program_name:
-        program = documents.Program.objects(Q(id=program_id) & Q(name=program_name)).first()
+        program = documents.Program.objects(
+            Q(id=program_id) & Q(name=program_name)
+        ).first()
         if not program:
             logger.debug(
                 "Either program_id and program_name do not match or no matching program"
@@ -142,13 +144,13 @@ def program_selector(program_name=None, program_id=None):
             )
     else:
         raise HTTPException(
-            status_code=404,
-            detail="No program selection criterion passed"
+            status_code=404, detail="No program selection criterion passed"
         )
 
     return program
 
-def convert_enum_to_timedelta(option: str):
+
+def convert_enum_to_timedelta(option: str):  # pragma: no cover
     if option == "Day":
         delta = timedelta(days=1)
     elif option == "Week":
@@ -159,5 +161,5 @@ def convert_enum_to_timedelta(option: str):
         delta = timedelta(weeks=52)
     else:
         delta = None
-    
+
     return delta
