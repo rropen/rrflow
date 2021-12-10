@@ -1,16 +1,19 @@
 <template>
   <div class="d-flex justify-center align-center">
     <div class="pa-2">
-      <h3 class="pb-2">Flow Distribution</h3>
-      <p>Distribution of Flow Items completed in that period</p>
+      <h3 class="pb-2">Flow Efficiency</h3>
+      <p>
+        Percentage of time where the flow item was active vs total time to
+        complete
+      </p>
     </div>
   </div>
-  <div class="container mx-auto flex justify-center" id="distribution" />
+  <div class="container mx-auto flex justify-center" id="efficiency" />
 </template>
 
 <script setup lang="ts">
 import { defineProps, ref, onMounted, computed } from "vue";
-import { verticalStackedBarChart } from "../d3charts/verticalStackedBar.js";
+import { LineChart } from "../d3charts/lineChart.js";
 import axios from "axios";
 import * as d3 from "d3";
 
@@ -34,12 +37,11 @@ const props = defineProps({
 //--------------------------------------------------------------------------
 //                   CALLING RRFLOW API AND CLEANING DATA
 //--------------------------------------------------------------------------
-const url = `http://localhost:8181/metrics/distribution?period=${props.period}&duration=${props.duration}&program_id=${props.programId}`;
+const url = `http://localhost:8181/metrics/efficiency?period=${props.period}&duration=${props.duration}&program_id=${props.programId}`;
 function fetchMetricData() {
   let chartData = [];
   let flowCategories = ["feature", "defect", "debt", "risk"];
   axios.get(url).then((response) => {
-    // TODO: make this dynamic for multiple buckets (not just data.buckets[0])
     for (const bucket of response.data.buckets) {
       for (const [category, val] of Object.entries(bucket)) {
         let pushObject = { bucketStart: bucket.bucket_start };
@@ -51,6 +53,8 @@ function fetchMetricData() {
       }
     }
 
+    console.log(chartData);
+
     //Goal chartData to look like:
     // [
     //  {flowCategory: "defect", bucketStart: "100030223", value: 3},
@@ -58,20 +62,18 @@ function fetchMetricData() {
     //  ...
     // ]
 
-    // TODO: Make this chart vertical and convert date to readable format
-    const chart = verticalStackedBarChart(chartData, {
+    // zDomain: flowCategories,
+    // colors: ["#80bc00", "#e05928", "#059abe", "#e2e43a"],
+    const chart = LineChart(chartData, {
       x: (d) => d.bucketStart,
       y: (d) => d.value,
       z: (d) => d.flowCategory,
-      marginLeft: 60,
-      marginRight: 60,
-      // yDomain: d3.groupSort(chartData, ([d]) => -d.bucketStart, (d) => d.flowCategory),
-      // yDomain: (chartData.bucketStart),
-      zDomain: flowCategories,
-      colors: ["#80bc00", "#e05928", "#059abe", "#e2e43a"],
+      yLabel: "↑ Efficiency (%)",
+      height: 500, //TODO: make dynamic like distribution
+      color: "steelblue", // TODO: change to match dashboard
     });
 
-    const svg = d3.select("#distribution").node().append(chart);
+    const svg = d3.select("#efficiency").node().append(chart);
   });
 }
 
